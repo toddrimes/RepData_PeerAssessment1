@@ -48,7 +48,7 @@ dataset.
 
 ## Loading and preprocessing the data
 Ensure the downloaded zip-file is in the current working directory.
-```{r}
+```{r, echo=TRUE}
 if(!file.exists("getdata-projectfiles-UCI HAR Dataset.zip")) {
         temp <- tempfile()
         download.file("http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",temp)
@@ -62,7 +62,7 @@ df <- read.csv("activity.csv", header=T, quote="\"", sep=",")
 
 ## What is mean total number of steps taken per day?
 To determine this, aggregate all intervals by date and sum the steps and plot.  Also, check the daily mean and median steps across all dates.
-```{r}
+```{r, echo=TRUE}
 totalStepsByDate <- aggregate(steps ~ date, df, sum)
 hist(totalStepsByDate$steps, main = paste("Total Steps Each Day"), col="yellow", xlab="Number of Steps")
 dailyMean <- mean(totalStepsByDate$steps)
@@ -73,7 +73,7 @@ print(paste("Daily Median",dailyMedian))
 
 ## What is the average daily activity pattern?
 To determine this, aggregate the measurements by interval and average the steps; then plot.
-```{r}
+```{r, echo=TRUE}
 stepsByInterval <- aggregate(steps ~ interval, df, mean)
 plot(stepsByInterval$interval,stepsByInterval$steps, type="l", xlab="Daily Interval", ylab="Steps",main="Average Steps / Day / Interval")
 max_interval <- stepsByInterval[which.max(stepsByInterval$steps),1]
@@ -85,7 +85,7 @@ To determine the count of missing values, sum the number of records where NOT co
 To impute missing measurements, set a missing day-interval's value to the average for that same interval across all days.
 For the first day, which was all NA's, set all to zero (rather than the method above for each day-1 interval).  This is reasonable as it is in-line with day-2's similarly low values.
 Note the updated average mean and median across all intervals.
-```{r}
+```{r, echo=TRUE}
 naCount <- sum(!complete.cases(df))
 print(naCount)
 imputedData <- transform(df, steps = ifelse(is.na(df$steps), stepsByInterval$steps[match(df$interval, stepsByInterval$interval)], df$steps))
@@ -103,7 +103,7 @@ print(imputedMedian)
 ## Are there differences in activity patterns between weekdays and weekends?
 To determine this, add a factor to each date's record reflecting whether that day of the week is a weekday or weekend.
 Plot the resulting split aggregates in a 2-up conditioning plot.
-```{r}
+```{r, echo=TRUE}
 library(lattice)
 imputedData$dayFactor <- as.factor(ifelse(weekdays(as.Date(imputedData$date))=="Saturday" | weekdays(as.Date(imputedData$date))=="Sunday", "weekend", "weekday"))
 aggregateImputedData <- aggregate(steps~interval+dayFactor, imputedData, mean)
